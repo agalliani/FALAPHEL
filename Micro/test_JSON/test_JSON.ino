@@ -1,5 +1,8 @@
 #include <ArduinoJson.h>
 
+uint16_t configArray[32] = { 895, 0, 0, 0, 0, 895, 0, 895, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 };
+
+
 
 void setup() {
 
@@ -23,11 +26,28 @@ void loop() {
   */
 
   // Create the JSON document
-  StaticJsonDocument<200> doc;
-  doc["field"] = "hello";
+  StaticJsonDocument<600> doc;
+
+  JsonObject object = doc.to<JsonObject>();
+  object["operation"] = "CONFIG";
+
+  JsonArray array = doc["data"].to<JsonArray>();
+
+  for (int i = 0; i < 32; i++) {
+    array.add(configArray[i]);
+  }
+
+
+
+
+
+
+
+
+
   //doc["value"] = value;
 
-/*
+  /*
   StaticJsonDocument<800> doc;
   DeserializationError err = deserializeJson(doc, Serial);
 
@@ -40,6 +60,7 @@ void loop() {
     Serial.println("");
   } */
   serializeJson(doc, Serial);
+  Serial.println("");
 
   // Wait
   delay(5000);
