@@ -15,6 +15,7 @@ enum fstState {
 static uint16_t configArray[32];  // = {895,0,0,0,0,895,0,895,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
 static uint16_t configSetup;
 
+
 String selectedOperation;
 StaticJsonDocument<600> doc;
 DeserializationError err;
@@ -24,6 +25,8 @@ DeserializationError err;
 */
 
 void setup() {
+  pinMode(LED_BUILTIN, OUTPUT);
+
   // pinMode(clockPin, OUTPUT);
   // pinMode(dataPin, OUTPUT);
   Serial.begin(9600);
@@ -83,6 +86,8 @@ void FiniteStateMachine(int number) {
     case (0):
       state = STOP;
       Serial.println("STOP");
+      digitalWrite(LED_BUILTIN, LOW);
+
       break;
 
     case (1):
@@ -105,6 +110,7 @@ void FiniteStateMachine(int number) {
       {
         state = CHARGE_SCAN;
         Serial.println("CHARGE_SCAN: Started");
+        digitalWrite(LED_BUILTIN, HIGH);
         chargeScan();
         Serial.println("CHARGE_SCAN: Finished");
 

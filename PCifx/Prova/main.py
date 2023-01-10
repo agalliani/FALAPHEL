@@ -15,6 +15,8 @@ class ButtonApp(App):
 
     def build(self):
         # use a (r, g, b, a) tuple
+        
+        
         btnStart = Button(text="START",
                           font_size="20sp",
                           background_color=(1, 1, 1, 1),

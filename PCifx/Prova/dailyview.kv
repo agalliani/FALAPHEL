@@ -1,0 +1,14 @@
+#:kivy 1.10.0
+
+<WeatherWidget>:
+    cols: 1
+    BoxLayout:
+        height: "30dp"
+        size_hint_y: None
+        Label:
+            text: 'Selected serial port:'
+            size_hint_x: 0.25
+        Button:
+            text: 'New York, NY'
+            size_hint_x: 1
+            on_release: root.printing_test()
