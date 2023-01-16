@@ -35,6 +35,7 @@ class MasterView:
 
         sCurveFrame = ttk.LabelFrame(
             rightFrame, borderwidth=5, text="S Curve", width=200, height=100)
+        SCurveComponent(sCurveFrame)
 
         # positioning
 
@@ -46,6 +47,9 @@ class MasterView:
 
         sCurveFrame.grid(column=0, row=0, columnspan=3,
                          rowspan=2, sticky=(N, S, E, W), padx=8)
+        sCurveFrame.columnconfigure(0, weight=2)
+        sCurveFrame.columnconfigure(1, weight=2)
+        sCurveFrame.columnconfigure(2, weight=2)
 
     def build_left_section(self, container):
 

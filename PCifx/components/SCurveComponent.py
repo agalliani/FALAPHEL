@@ -12,5 +12,5 @@ class SCurveComponent:
         plt.plot([1, 2, 3, 4], [1, 4, 9, 16])
         # Create a canvas widget to display the plot
         canvas = FigureCanvasTkAgg(fig, master=root)
-        canvas.get_tk_widget().grid(column=0, row=0, columnspan=2,
+        canvas.get_tk_widget().grid(column=0, row=0, columnspan=3,
                                     rowspan=2, sticky=(N, S, E, W))
