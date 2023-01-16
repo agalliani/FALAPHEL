@@ -26,15 +26,10 @@ class SystemSettingsComponent:
 
         # Positioning
         serialPortsLabel.grid(column=0, row=0, padx=5, pady=5, sticky=(W))
-        serialPortsCombobox.grid(column=1, row=0, padx=5, pady=5, sticky=(W))
 
-        saveButtonLabel.grid(column=0, row=1, padx=5, pady=5, sticky=(W))
+        serialPortsCombobox.grid(
+            column=1, row=0, padx=5, pady=5, sticky=(W))
+
+        saveButtonLabel.grid(column=0, row=1, padx=5, pady=5, sticky=( W))
         saveButton.grid(column=1, row=1, padx=5, pady=5, sticky=(W))
         chosenPathLabel.grid(column=0, row=2, columnspan=3, sticky=(W))
-
-        root.columnconfigure(0, weight=1)
-        root.columnconfigure(1, weight=1)
-
-        root.rowconfigure(0, weight=1)
-        root.rowconfigure(1, weight=1)
-        root.rowconfigure(2, weight=1)

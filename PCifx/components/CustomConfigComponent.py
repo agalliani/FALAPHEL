@@ -25,18 +25,28 @@ class CustomConfigComponent:
             root, text="Single pixel scan", onvalue=True, offvalue=False)
         isSinglePixelCheck.state(['!alternate'])
 
+        buttonCustomScan = ttk.Button(
+            root, text="Custom Charge Scan")  # button
+
        # Positioning
 
-        startPixelSelectionSpinbox.grid(column=0, row=0, padx=5, pady=5)
-        startPixelSelectionLabel.grid(column=1, row=0, padx=5, pady=5)
+        startPixelSelectionSpinbox.grid(
+            column=0, row=0, pady=5)
+        startPixelSelectionLabel.grid(
+            column=1, row=0,  sticky=(W))
 
-        endPixelSelectionSpinbox.grid(column=0, row=1, padx=5, pady=5)
-        endPixelSelectionLabel.grid(column=1, row=1, padx=5, pady=5)
+        endPixelSelectionSpinbox.grid(
+            column=0, row=1,  padx=5, pady=5)
+        endPixelSelectionLabel.grid(
+            column=1, row=1, sticky=(W), pady=5)
 
-        isSinglePixelCheck.grid(column=0, row=2, padx=5, pady=5)
+        isSinglePixelCheck.grid(column=0, row=2,  pady=5)
+
+        buttonCustomScan.grid(column=2, row=1, sticky=(E), padx=5)
 
         root.columnconfigure(0, weight=1)
         root.columnconfigure(1, weight=1)
+        root.columnconfigure(2, weight=1)
 
         root.rowconfigure(0, weight=1)
         root.rowconfigure(1, weight=1)
