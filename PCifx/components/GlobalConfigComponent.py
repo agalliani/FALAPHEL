@@ -28,8 +28,3 @@ class GlobalConfigComponent:
         self.checkLkg.grid(column=0, row=2, sticky=(N, S, W), padx=5)
         self.buttonFullScan.grid(column=1, row=1, sticky=(E), padx=5)
 
-        root.columnconfigure(0, weight=1)
-        root.columnconfigure(1, weight=1)
-        root.rowconfigure(0, weight=1)
-        root.rowconfigure(1, weight=1)
-        root.rowconfigure(2, weight=1)

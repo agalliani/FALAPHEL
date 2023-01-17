@@ -6,6 +6,7 @@ from InjectionSettingsComponent import InjectionSettingsComponent
 from CustomConfigComponent import CustomConfigComponent
 from SystemSettingsComponent import SystemSettingsComponent
 from SCurveComponent import SCurveComponent
+from ThresholdDispersionComponent import ThresholdDispersionComponent
 
 
 class MasterView:
@@ -19,13 +20,6 @@ class MasterView:
         container.grid(column=0, row=0, sticky=(
             N, S, E, W), padx=5, pady=5)
 
-        container.columnconfigure(0, weight=0)
-        container.columnconfigure(1, weight=0)
-        container.columnconfigure(2, weight=0)
-        container.columnconfigure(3, weight=2)
-        container.columnconfigure(4, weight=2)
-        container.columnconfigure(5, weight=2)
-
         self.build_left_section(container)
         self.build_right_section(container)
 
@@ -37,19 +31,20 @@ class MasterView:
             rightFrame, borderwidth=5, text="S Curve", width=200, height=100)
         SCurveComponent(sCurveFrame)
 
+        distributionFrame = ttk.LabelFrame(
+            rightFrame, borderwidth=5, text="Distributions", width=200, height=100)
+        ThresholdDispersionComponent(distributionFrame)
+
         # positioning
 
         rightFrame.grid(column=3, row=0, columnspan=3,
                         rowspan=2, sticky=(N, S, E, W), padx=8)
-        rightFrame.columnconfigure(0, weight=2)
-        rightFrame.columnconfigure(1, weight=2)
-        rightFrame.columnconfigure(2, weight=2)
 
         sCurveFrame.grid(column=0, row=0, columnspan=3,
-                         rowspan=2, sticky=(N, S, E, W), padx=8)
-        sCurveFrame.columnconfigure(0, weight=2)
-        sCurveFrame.columnconfigure(1, weight=2)
-        sCurveFrame.columnconfigure(2, weight=2)
+                         rowspan=1, sticky=(N, S, E, W), padx=8)
+
+        distributionFrame.grid(column=0, row=1, columnspan=3,
+                               rowspan=1, sticky=(N, S, E, W), padx=8)
 
     def build_left_section(self, container):
 

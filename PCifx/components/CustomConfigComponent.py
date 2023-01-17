@@ -44,10 +44,3 @@ class CustomConfigComponent:
 
         buttonCustomScan.grid(column=2, row=1, sticky=(E), padx=5)
 
-        root.columnconfigure(0, weight=1)
-        root.columnconfigure(1, weight=1)
-        root.columnconfigure(2, weight=1)
-
-        root.rowconfigure(0, weight=1)
-        root.rowconfigure(1, weight=1)
-        root.rowconfigure(2, weight=1)

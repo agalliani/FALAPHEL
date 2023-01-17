@@ -48,10 +48,4 @@ class InjectionSettingsComponent:
         chargeStepSpinbox.grid(column=0, row=3, padx=5, pady=5)
         chargeStepLabel.grid(column=1, row=3,  padx=5, pady=2.5, sticky=(W))
 
-        root.columnconfigure(0, weight=1)
-        root.columnconfigure(1, weight=1)
-
-        root.rowconfigure(0, weight=1)
-        root.rowconfigure(1, weight=1)
-        root.rowconfigure(2, weight=1)
-        root.rowconfigure(3, weight=1)
+ 
