@@ -1,9 +1,9 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog as FD
+from CommunicationService import CommunicationService
 
 
-import sys
 import glob
 import serial
 import json
@@ -11,87 +11,21 @@ import os
 
 
 class SystemSettingsComponent:
-    serial = serial.Serial()
-    serial.baudrate = 9600
-
-    directory = ""
-
     def ledOn(self):
-        data = {}
-        data["operation"] = "CHARGE_SCAN"
-        data = json.dumps(data)
-
-        if not self.serial.isOpen():
-            print("serial port is closed")
-
-        self.serial.write(data.encode('ascii'))
-        # serialPort.flush()
-        try:
-            while(True):
-                incoming = self.serial.readline().strip().decode("utf-8")
-                print(incoming)
-                if(incoming == "EOC"):
-                    print("Closing serial communication")
-
-                    break
-        except Exception as e:
-            print(e)
-            pass
+        self.communicationService.sendChargeScan()
 
     def ledOff(self):
-        if self.serial.is_open:
-            data = {}
-            data["operation"] = "STOP"
-            data = json.dumps(data)
-
-            self.serial.write(data.encode('ascii'))
-            # serialPort.flush()
-            try:
-                while(True):
-                    incoming = self.serial.readline().strip().decode("utf-8")
-                    print(incoming)
-                    if("EOC" in incoming):
-                        self.serial.close()
-                        break
-            except Exception as e:
-                print(e)
-                pass
-        else:
-            print("Attempting a connection that does not exist")
+        self.communicationService.sendStop()
 
     def serialConnect(self, combobox, button):
         if(button['text'] == "Connect"):
-            self.serial.port = combobox.get()
-            self.serial.open()
+            self.communicationService.serialConnect(combobox.get())
             self.ledOn()
-
             button.config(text="Disconnect")
-            print(combobox.get())
         else:
             self.ledOff()
             combobox.set('')
             button.config(text="Connect")
-
-    def getSerialPorts(self):
-        if sys.platform.startswith('win'):
-            ports = ['COM%s' % (i + 1) for i in range(256)]
-        elif sys.platform.startswith('linux') or sys.platform.startswith('cynwin'):
-            # this excludes your current terminal "/dev/tty"
-            ports = glob.glob('/dev/tty[A-Za-z]*')
-        elif sys.platform.startswith('darwin'):
-            ports = glob.glob('/dev/tty.*')
-        else:
-            raise EnvironmentError('Unsupported platform')
-
-        result = []
-        for port in ports:
-            try:
-                s = serial.Serial(port)
-                s.close()
-                result.append(port)
-            except (OSError, serial.SerialException):
-                pass
-        return result
 
     def askDirectory(self, label, button):
         self.directory = FD.askdirectory()
@@ -100,22 +34,27 @@ class SystemSettingsComponent:
         print(self.directory)
         button['state'] = NORMAL
 
+        self.communicationService.directory = self.directory
+
     def openDirectory(self):
-        print("open dir")
         path = os.path.realpath(self.directory)
         os.startfile(path)
 
     def __init__(self, root):
 
+        self.communicationService = CommunicationService()
+        self.directory = ""
+
         serialPortsVar = StringVar()
         serialPortsCombobox = ttk.Combobox(root, textvariable=serialPortsVar)
-        serialPortsCombobox['values'] = self.getSerialPorts()
+        serialPortsCombobox['values'] = self.communicationService.getSerialPorts()
         serialPortsLabel = Label(root, text="Serial connection: ")
 
         serialPortConnectButton = ttk.Button(
             root, text="Connect", command=lambda: self.serialConnect(serialPortsCombobox, serialPortConnectButton))
 
-        chosenPathLabel = Label(root, text=self.directory, width=50)
+        chosenPathLabel = Label(
+            root, text=self.directory, width=50)
 
         openButton = ttk.Button(root, text="Open folder",
                                 command=lambda: self.openDirectory(), state=DISABLED)
