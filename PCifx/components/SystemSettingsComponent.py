@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 from tkinter import filedialog as FD
-from CommunicationService import CommunicationService
+from services.CommunicationService import CommunicationService
 
 
 import glob

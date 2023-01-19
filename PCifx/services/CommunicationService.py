@@ -28,13 +28,14 @@ class CommunicationService(metaclass=Singleton):
             "numSteps": 0
         }
         self.globalMatrixConfig = {
-            "cd25": False,
-            "cd50": False,
-            "leakage": False
+            "cd25": 0,
+            "cd50": 0,
+            "leakage": 0
         }
         self.customScanSettings = {
             "start": 0,
-            "end": 0
+            "end": 0,
+            "isSinglePixel": False
         }
 
     def serialConnect(self, port):
@@ -113,10 +114,33 @@ class CommunicationService(metaclass=Singleton):
 
     def setQmax(self, num):
         self.injectionSettings["Qmax"] = num
-       
 
     def setNumSteps(self, num):
         self.injectionSettings["numSteps"] = num
 
     def printInjSet(self):
         print(self.injectionSettings)
+
+    def setCD25(self, num):
+        self.globalMatrixConfig["cd25"] = num
+
+    def setCD50(self, num):
+        self.globalMatrixConfig["cd50"] = num
+
+    def setLeakage(self, num):
+        self.globalMatrixConfig["leakage"] = num
+
+    def printGlobalMatrixConfig(self):
+        print(self.globalMatrixConfig)
+
+    def setCustomStart(self, num):
+        self.customScanSettings["start"] = num
+
+    def setCustomEnd(self, num):
+        self.customScanSettings["end"] = num
+
+    def setCustomSinglePixel(self, flag):
+        self.customScanSettings["isSinglePixel"] = flag
+
+    def printCustomScanSettings(self):
+        print(self.customScanSettings)

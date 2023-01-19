@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 
-from CommunicationService import CommunicationService
+from services.CommunicationService import CommunicationService
 
 
 # It's a GUI component that allows the user to set the number of injections, the minimum charge, the

@@ -1,12 +1,12 @@
 from tkinter import *
 from tkinter import ttk
 
-from GlobalConfigComponent import GlobalConfigComponent
-from InjectionSettingsComponent import InjectionSettingsComponent
-from CustomConfigComponent import CustomConfigComponent
-from SystemSettingsComponent import SystemSettingsComponent
-from SCurveComponent import SCurveComponent
-from ThresholdDispersionComponent import ThresholdDispersionComponent
+from components.GlobalConfigComponent import GlobalConfigComponent
+from components.InjectionSettingsComponent import InjectionSettingsComponent
+from components.CustomConfigComponent import CustomConfigComponent
+from components.SystemSettingsComponent import SystemSettingsComponent
+from components.SCurveComponent import SCurveComponent
+from components.ThresholdDispersionComponent import ThresholdDispersionComponent
 
 
 class MasterView:
