@@ -34,7 +34,7 @@ class AnalysisService(metaclass=Singleton):
             [0, 0, 0, 0, 9.38e-3, 3.82e-2, 4.67e-2, 2.12e-1, 3.59e-1, 4.76e-1,
              6.29e-1, 7.35e-1, 8.46e-1, 9.55e-1, 9.86e-1, 1, 1, 1, 1]
         ]
-        print("CIAO")
+        
 
     def myERF(self, x, mu, sigma):
         return 0.5*(1 + erf((x-mu)/(sigma*sqrt(2))))
@@ -48,10 +48,12 @@ class AnalysisService(metaclass=Singleton):
 
         fit_A = parameters[0]
         fit_B = parameters[1]
+        """
         print("Mean: ", fit_A)
         print("\nDispersion:", fit_B)
         print("\nCovariance matrix:\n", covariance)
         print("\nstd: ", np.sqrt(np.diag(covariance)))
+        """
 
         fig, ax = plt.subplots(1, 1, figsize=(8, 2.5))
         fit_x = np.arange(
@@ -66,8 +68,8 @@ class AnalysisService(metaclass=Singleton):
                     xytext=(0, 0),  # txt distance from the point
                     ha='left')  # horizontal alignment
 
-        plt.xlabel('Input charge (electrons)')
-        plt.ylabel('Probability')
+        plt.xlabel('Input charge (e-)')
+        plt.ylabel('Efficiency')
 
         plt.grid()
         plt.legend()

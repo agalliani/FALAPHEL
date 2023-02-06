@@ -22,21 +22,24 @@ class CommunicationService(metaclass=Singleton):
         self.directory = ""
 
         self.injectionSettings = {
-            "numInj": 0,
-            "Qmin": 0,
-            "Qmax": 0,
-            "numSteps": 0
+            "numInj": 200,
+            "Qmin": 400,
+            "Qmax": 1600,
+            "numSteps": 50
         }
         self.globalMatrixConfig = {
             "cd25": 0,
             "cd50": 0,
-            "leakage": 0
+            "leakage": 0,
         }
         self.customScanSettings = {
             "start": 0,
             "end": 0,
             "isSinglePixel": False
         }
+
+        # 10bit config mask with LKG, C0 and C1 disabled.
+        self.mask = 0b1000111111
 
     def serialConnect(self, port):
         self.serial.port = port
@@ -63,9 +66,7 @@ class CommunicationService(metaclass=Singleton):
                 pass
         return result
 
-    def sendChargeScan(self):
-        data = {}
-        data["operation"] = "CHARGE_SCAN"
+    def sendJsonData(self, data):
         data = json.dumps(data)
 
         if not self.serial.isOpen():
@@ -132,6 +133,7 @@ class CommunicationService(metaclass=Singleton):
 
     def printGlobalMatrixConfig(self):
         print(self.globalMatrixConfig)
+        self.sendFullScanRequest()
 
     def setCustomStart(self, num):
         self.customScanSettings["start"] = num
@@ -144,3 +146,49 @@ class CommunicationService(metaclass=Singleton):
 
     def printCustomScanSettings(self):
         print(self.customScanSettings)
+
+    def sendFullScanRequest(self):
+        setup = self.mask
+
+        if(self.globalMatrixConfig["leakage"] == 1):
+            setup = self.set_bit(setup, 8, 1)
+
+        if(self.globalMatrixConfig["cd25"] == 1):
+            setup = self.set_bit(setup, 7, 1)
+
+        if(self.globalMatrixConfig["cd50"] == 1):
+            setup = self.set_bit(setup, 6, 1)
+
+        body = {
+            "operation": "CHARGE_SCAN_FULL_MATRIX",
+            "setup": bin(setup),
+            "numInj": self.injectionSettings["numInj"],
+            "numStep": self.injectionSettings["numSteps"],
+            "Qmin": self.injectionSettings["Qmin"],
+            "Qmax": self.injectionSettings["Qmax"]
+        }
+
+        print(body)
+
+        self.sendJsonData(body)
+
+    def set_bit(self, v, index, x):
+        """
+        If x is True, set the bit at index in v to 1. If x is False, set the bit at index in v to 0.
+        Set the index:th bit of v to 1 if x is truthy, else to 0, and return the new value.
+
+        :param v: the value to be modified
+        :param index: the index of the bit you want to set
+        :param x: The value to set the bit to. If x is anything other than 0, the bit is set. Otherwise,
+        it's cleared
+        :return: The value of v with the bit at index set to x.
+        """
+
+        # Compute mask, an integer with just bit 'index' set.
+        mask = 1 << index
+        # Clear the bit indicated by the mask (if x is False)
+        v &= ~mask
+        if x:
+            # If x was True, set the bit indicated by the mask.
+            v |= mask
+        return v            # Return the result, we're done.

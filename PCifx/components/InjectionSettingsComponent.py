@@ -20,7 +20,7 @@ class InjectionSettingsComponent:
         # Element declaration
 
         # injections
-        injNumberVal = StringVar(value=1)
+        injNumberVal = StringVar(value=200)
         self.injNumberSpinbox = ttk.Spinbox(
             root,
             from_=1,
@@ -33,7 +33,7 @@ class InjectionSettingsComponent:
             "<Return>", self.setAll)
 
         # Qmin
-        minChargeVal = StringVar(value=1)
+        minChargeVal = StringVar(value=400)
         self.minChargeSpinbox = ttk.Spinbox(
             root,
             from_=1,
@@ -48,7 +48,7 @@ class InjectionSettingsComponent:
             root, text="Qin min - Start value of the charge scan - in electrons")
 
         # Qmax
-        maxChargeVal = StringVar(value=2)
+        maxChargeVal = StringVar(value=1600)
         self.maxChargeSpinbox = ttk.Spinbox(
             root,
             from_=2,
@@ -63,7 +63,7 @@ class InjectionSettingsComponent:
             root, text="Qin max - End value of the charge scan - in electrons")
 
         # steps
-        chargeStepVal = StringVar(value=1)
+        chargeStepVal = StringVar(value=50)
         self.chargeStepSpinbox = ttk.Spinbox(
             root,
             from_=1,
@@ -73,7 +73,7 @@ class InjectionSettingsComponent:
             command=lambda: self.communicationService.setNumSteps(chargeStepVal.get()))
         self.chargeStepSpinbox.bind(
             "<Return>", self.setAll)
-        chargeStepLabel = Label(root, text="Number of steps")
+        chargeStepLabel = Label(root, text="Number of steps       (press Enter or use the arrows to confirm)")
 
         # Positioning
 

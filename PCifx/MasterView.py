@@ -14,8 +14,10 @@ class MasterView:
     def __init__(self, root):
 
         # main frame
-        container = ttk. LabelFrame(
-            root, text="Container", width=200, height=100)
+        # container = ttk. LabelFrame(
+        #    root, text="Container", width=200, height=100)
+        container = ttk.Frame(
+            root, width=200, height=100)
 
         container.grid(column=0, row=0, sticky=(
             N, S, E, W), padx=5, pady=5)
@@ -24,8 +26,10 @@ class MasterView:
         self.build_right_section(container)
 
     def build_right_section(self, container):
-        rightFrame = ttk.LabelFrame(
-            container, borderwidth=5, text="rightFrame", width=200, height=100)
+        # rightFrame = ttk.LabelFrame(
+        #    container, borderwidth=5, text="rightFrame", width=200, height=100)
+        rightFrame = ttk.Frame(
+            container, borderwidth=5, width=200, height=100)
 
         sCurveFrame = ttk.LabelFrame(
             rightFrame, borderwidth=5, text="S Curve", width=200, height=100)
@@ -49,8 +53,10 @@ class MasterView:
     def build_left_section(self, container):
 
        # Left column elements
-        leftFrame = ttk. LabelFrame(
-            container, borderwidth=5, text="leftFrame", width=200, height=100)
+       # leftFrame = ttk. LabelFrame(
+       #     container, borderwidth=5, text="leftFrame", width=200, height=100)
+        leftFrame = ttk. Frame(
+            container, borderwidth=5, width=200, height=100)
 
         systemSettingsFrame = ttk.LabelFrame(
             leftFrame, borderwidth=5, text="System Settings", width=200, height=100)  # system settings
