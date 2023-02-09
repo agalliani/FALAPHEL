@@ -5,7 +5,8 @@ enum fstState {
   STOP,
   CONFIG_CUSTOM,
   CHARGE_SCAN,
-  CHARGE_SCAN_FULL_MATRIX
+  CHARGE_SCAN_FULL_MATRIX,
+  START
 } state = STOP;
 
 // int clockPin = 14;  //12;
@@ -64,9 +65,25 @@ void loop() {
       else if (selectedOperation.equals("CHARGE_SCAN_FULL_MATRIX")) {
 
         Serial.println("Full matrix charge scan configuration");
-        configSetup = doc["setup"].as<uint16_t>();
+        String s = doc["setup"].as<String>();
+        Serial.println(s);
+
+        int value = 0;
+        for (int i = 0; i < s.length(); i++)  // for every character in the string  strlen(s) returns the length of a char array
+        {
+          value *= 2;                // double the result so far
+          if (s[i] == '1') value++;  //add 1 if needed
+        }
+        configSetup = value;
         Serial.println(configSetup);
+        
+
+
         FiniteStateMachine(3);
+      } else if (selectedOperation.equals("START")) {
+
+        Serial.println("LED ON");
+        FiniteStateMachine(4);
       } else {
         Serial.println("Unknown operation request");
       }
@@ -110,7 +127,6 @@ void FiniteStateMachine(int number) {
       {
         state = CHARGE_SCAN;
         Serial.println("CHARGE_SCAN: Started");
-        digitalWrite(LED_BUILTIN, HIGH);
         chargeScan();
         Serial.println("CHARGE_SCAN: Finished");
 
@@ -139,6 +155,11 @@ void FiniteStateMachine(int number) {
 
         Serial.println("CHARGE_SCAN_FULL_MATRIX: Finished");
         break;
+      }
+    case (4):
+      {
+        state = START;
+        digitalWrite(LED_BUILTIN, HIGH);
       }
 
     default:

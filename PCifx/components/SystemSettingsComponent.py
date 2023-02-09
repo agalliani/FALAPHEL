@@ -11,8 +11,7 @@ import os
 
 
 class SystemSettingsComponent:
-    def ledOn(self):
-        self.communicationService.sendChargeScan()
+    
 
     def ledOff(self):
         self.communicationService.sendStop()
@@ -20,7 +19,7 @@ class SystemSettingsComponent:
     def serialConnect(self, combobox, button):
         if(button['text'] == "Connect"):
             self.communicationService.serialConnect(combobox.get())
-            self.ledOn()
+            #self.ledOn()
             button.config(text="Disconnect")
         else:
             self.ledOff()

@@ -44,6 +44,12 @@ class CommunicationService(metaclass=Singleton):
     def serialConnect(self, port):
         self.serial.port = port
         self.serial.open()
+        
+        data = {
+            "operation": "START"
+        }
+
+        self.sendJsonData(data)        
 
     def getSerialPorts(self):
         if sys.platform.startswith('win'):
@@ -78,7 +84,7 @@ class CommunicationService(metaclass=Singleton):
                 incoming = self.serial.readline().strip().decode("utf-8")
                 print(incoming)
                 if(incoming == "EOC"):
-                    print("Closing serial communication")
+                    #print("Closing serial communication")
 
                     break
         except Exception as e:
@@ -106,6 +112,8 @@ class CommunicationService(metaclass=Singleton):
                 pass
         else:
             print("Attempting a connection that does not exist")
+            
+    
 
     def setNumInjection(self, num):
         self.injectionSettings["numInj"] = num
