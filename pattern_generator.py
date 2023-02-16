@@ -1,5 +1,7 @@
 import os, pyvisa
 from contextlib import contextmanager
+import time
+
 
 
 
@@ -45,37 +47,59 @@ with _stopVerboseLogging():
     gpib_device.write("*CLS") #Clears the event registers in all register groups
     print(gpib_device.query("*IDN?"))
     
+    
+    # CLOCK SETTINGS
+    gpib_device.write("TBAS:LDELay ON")
+    gpib_device.write("TBAS:CRANge 12") # clock range between 50MHz - 100MHz
+    gpib_device.write("TBAS:DOFFset 0")
+    gpib_device.write("TBAS:FREQuency 80MHZ")
+    
     # A block is a container for the pattern data to be output
     gpib_device.write("GROup:DELete:ALL")
     gpib_device.write("BLOCk:DELete:ALL")
     
-    gpib_device.write("BLOCk:NEW \"Block1\",10000")  
+    gpib_device.write("BLOCk:NEW \"Block1\",80000")  
     gpib_device.write("BLOCk:SELect \"Block1\"")
         
     gpib_device.write("GROup:NEW \"Group1\",2")
-    gpib_device.write("SIGNal:ASSign \"Group1[1]\",\"1A1\"")
-    gpib_device.write("SIGNal:ASSign \"Group1[0]\",\"1A2\"")
+    gpib_device.write("SIGNal:ASSign \"Group1[0]\",\"1A1\"") # 40Mhz clock signal
+    gpib_device.write("SIGNal:ASSign \"Group1[1]\",\"1A2\"") # injection signal
     
-    pattern1 = ""
-    pattern0 = ""
-    for i in range(0,5000):
-        pattern1 += "1"
-        pattern0 += "0"
-    
-    
-    gpib_device.write("SIGNal:DATa \"Group1[1]\",0,10000,\""+pattern1+pattern0+"\"")
-    gpib_device.write("SIGNal:DATa \"Group1[0]\",0,10000,\""+pattern1+pattern0+"\"")
-    
-    gpib_device.write("SIGNal:HIGH \"Group1[1]\",0.9")    
-    gpib_device.write("SIGNal:LOW \"Group1[1]\",0")    
-    #gpib_device.write("SIGNal:LOW \"Group1[1]\",0")
-    gpib_device.write("SIGNal:OFFSet \"Group1[1]\", 0")  
-  
-    
+   
     #gpib_device.write("SIGNal:AMPLitude \"Group1[0]\",2")
     gpib_device.write("SIGNal:OFFSet \"Group1[0]\", 0")
     gpib_device.write("SIGNal:HIGH \"Group1[0]\",0.9")    
-    gpib_device.write("SIGNal:LOW \"Group1[0]\",0")    
+    gpib_device.write("SIGNal:LOW \"Group1[0]\",0")
+    #gpib_device.write("SIGNal:HLIMit \"Group1[0]\",0") 
+    #gpib_device.write("SIGNal:LLIMit \"Group1[0]\",0")
+    #gpib_device.write("SIGNal:LIMit \"Group1[0]\",0") 
+    gpib_device.write("SIGNal:LDELay \"Group1[0]\",0") 
+
+    
+    injectionAmplitude = "0.8"
+    gpib_device.write("SIGNal:OFFSet \"Group1[1]\", 0")
+    gpib_device.write("SIGNal:HIGH \"Group1[1]\","+injectionAmplitude)    
+    gpib_device.write("SIGNal:LOW \"Group1[1]\",0")
+    #gpib_device.write("SIGNal:HLIMit \"Group1[1]\",0") 
+    #gpib_device.write("SIGNal:LLIMit \"Group1[1]\",0")
+    #gpib_device.write("SIGNal:LIMit \"Group1[1]\",0") 
+    delay = "0ns"
+    gpib_device.write("SIGNal:LDELay \"Group1[1]\","+delay+"") 
+    
+    patternClock = ""
+    patternInjection1 = ""
+    patternInjection0 = ""
+    for i in range(0,40000):
+        patternClock += "01"
+        patternInjection1 += "1"
+        patternInjection0 += "0"
+    
+    #print(patternInjection1+patternInjection0)
+    
+    gpib_device.write("SIGNal:DATa \"Group1[0]\",0,80000,\""+patternClock+"\"")
+    gpib_device.write("SIGNal:DATa \"Group1[1]\",0,80000,\""+patternInjection1+patternInjection0+"\"")
+    
+    
 
     
     #gpib_device.write("PGENA:CH2:LDELay 4ns")
@@ -86,17 +110,39 @@ with _stopVerboseLogging():
     
     #gpib_device.write("TBAS:RUN 1")
     
-    # CLOCK SETTINGS
-    gpib_device.write("OUTPut:CLOCk:AMPLitude 0.9") #set clock voltage to 900mV    
-    gpib_device.write("OUTPut:CLOCk:OFFSet 0.45")     
-    gpib_device.write("OUTPut:CLOCk:STATe ON") # This command turns on or off the clock output.
-    gpib_device.write("OUTPut:CLOCk:TIMPedance 50") # sets clock output termination impedance to 50 ohm
-    gpib_device.write("TBAS:FREQuency 40MHZ")
+
     
     
     #Start Sequencer
     gpib_device.write("TBAS:RUN ON") # start sequencer      
     gpib_device.write("OUTPut:STATe:ALL ON") # This command turns on or off all of the outputs (all assigned outputs, clock output,DC output).
 
+    #time.sleep(5)
+    
 
+    #delays = ["0ns", "2ns", "4ns", "10ns", "12ns", "18ns", "20ns", "25ns"]
+    
+    #for t in delays:
+    #    time.sleep(5)
+    #    print(t)
+    #    gpib_device.write("SIGNal:LDELay \"Group1[1]\","+t) 
+     
+    
+    
+    amplitudes = ["0.8", "0.7","0.6","0.5","0.1", "0.05", "0.03"]
+    
+    for x in amplitudes:
+        time.sleep(8)
+        print(x)
+        gpib_device.write("SIGNal:HIGH \"Group1[1]\","+x)    
+   
+    
+
+
+
+
+   
+
+
+ 
 
