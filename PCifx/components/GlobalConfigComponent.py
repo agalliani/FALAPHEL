@@ -46,7 +46,7 @@ class GlobalConfigComponent:
         self.buttonFullScan = ttk.Button(
             root,
             text="Full Matrix Charge Scan",
-            command=lambda: self.communicationService.printGlobalMatrixConfig())  # button
+            command=lambda: self.communicationService.sendFullScanRequest())  # button
 
     def position_widgets(self, root):
         self.checkCD25.grid(column=0, row=0, sticky=(N, S, W), padx=5)

@@ -1,7 +1,9 @@
+from glob import glob
 import json
 import serial
 import sys
 
+from services.DTGService import DTGService
 
 class Singleton(type):
     _instances = {}
@@ -16,6 +18,9 @@ class Singleton(type):
 class CommunicationService(metaclass=Singleton):
 
     def __init__(self):
+        self.DTGService = DTGService()
+        
+        
         self.serial = serial.Serial()
         self.serial.baudrate = 9600
 
@@ -42,6 +47,7 @@ class CommunicationService(metaclass=Singleton):
         self.mask = 0b1000111111
 
     def serialConnect(self, port):
+        #print("Connection request")
         self.serial.port = port
         self.serial.open()
         
@@ -77,12 +83,20 @@ class CommunicationService(metaclass=Singleton):
 
         if not self.serial.isOpen():
             print("serial port is closed")
+        
+        #print(data)
 
         self.serial.write(data.encode('ascii'))
         try:
             while(True):
                 incoming = self.serial.readline().strip().decode("utf-8")
                 print(incoming)
+                if("FCS1" in incoming):
+                    initChargeAmplitude = float(incoming.split("-")[1])
+                    self.DTGService.sendSettings(initChargeAmplitude)
+                    self.DTGService.startSequencer()
+                if("UPAMP" in incoming):
+                    self.DTGService.setInjectionAmplitude(float(incoming.split("-")[2]))
                 if(incoming == "EOC"):
                     #print("Closing serial communication")
 
@@ -100,6 +114,8 @@ class CommunicationService(metaclass=Singleton):
 
             self.serial.write(data.encode('ascii'))
             # serialPort.flush()
+            
+            self.DTGService.stopSequencer()
             try:
                 while(True):
                     incoming = self.serial.readline().strip().decode("utf-8")
@@ -141,7 +157,7 @@ class CommunicationService(metaclass=Singleton):
 
     def printGlobalMatrixConfig(self):
         print(self.globalMatrixConfig)
-        self.sendFullScanRequest()
+        #self.sendFullScanRequest()
 
     def setCustomStart(self, num):
         self.customScanSettings["start"] = num

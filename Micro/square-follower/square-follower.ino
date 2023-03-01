@@ -1,9 +1,11 @@
-const int pinOut = 13;
+const int pinOut = 4;
 const int pinInRise = 2;
 const int pinInFall = 3;
 
 volatile int state = LOW;
-long int count = 0, flag = 0;
+volatile long int count = 0, flag = 0;
+
+volatile bool communicating = true;
 
 void setup() {
   // put your setup code here, to run once:
@@ -21,18 +23,23 @@ void setup() {
 void loop() {
 
   digitalWrite(pinOut, state);
+  if (communicating) {
+    if (count > 10000) {
+      Serial.print(flag);
+      Serial.println(" - Up charge");
+      flag += 1;
+      count = 0;
+    }
 
-  if (count > 10000) {
-    Serial.print(flag);
-    Serial.println(" - Up charge");
-    flag +=1;
-    count = 0;
+    if (flag >= 2) {
+      communicating = false;
+      Serial.println("EOC");
+    }
   }
 }
 
 void riseUp() {
   state = HIGH;
-
 }
 
 void fallDown() {

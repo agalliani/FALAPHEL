@@ -1,5 +1,4 @@
 from tkinter import *
-from tkinter import ttk
 
 from services.CommunicationService import CommunicationService
 
@@ -24,7 +23,7 @@ class CustomConfigComponent:
         self.position_widgets(root)
 
     def create_widgets(self, root):
-        self.startPixelSelectionSpinbox = ttk.Spinbox(
+        self.startPixelSelectionSpinbox = Spinbox(
             root,
             from_=0,
             to=29,
@@ -38,7 +37,7 @@ class CustomConfigComponent:
 
         self.startPixelSelectionLabel = Label(root, text="Start pixel range")
 
-        self.endPixelSelectionSpinbox = ttk.Spinbox(
+        self.endPixelSelectionSpinbox = Spinbox(
             root,
             from_=1,
             to=30,
@@ -52,7 +51,7 @@ class CustomConfigComponent:
 
         self.endPixelSelectionLabel = Label(root, text="End pixel range")
 
-        self.isSinglePixelCheck = ttk.Checkbutton(
+        self.isSinglePixelCheck = Checkbutton(
             root,
             text="Single pixel scan",
             variable=self.isSinglePixelVal,
@@ -60,7 +59,7 @@ class CustomConfigComponent:
             onvalue=True,
             offvalue=False)
 
-        self.buttonCustomScan = ttk.Button(
+        self.buttonCustomScan = Button(
             root,
             text="Custom Charge Scan",
             command=lambda: self.communicationService.printCustomScanSettings())  # button

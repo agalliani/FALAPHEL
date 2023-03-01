@@ -15,7 +15,7 @@ class SCurveComponent:
 
         # injections
         self.pixelCurveVal = IntVar(value=1)
-        self.pixelCurveSpinbox = ttk.Spinbox(
+        self.pixelCurveSpinbox = Spinbox(
             root,
             from_=0,
             to=len(self.analysisService.x_erf)-1,

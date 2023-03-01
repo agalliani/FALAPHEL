@@ -42,7 +42,7 @@ def printConnectedDevices():
 with _stopVerboseLogging():
     #printConnectedDevices()
     resource_manager = pyvisa.ResourceManager()
-    gpib_device = resource_manager.open_resource('GPIB0::29::INSTR', write_termination='\n')
+    gpib_device = resource_manager.open_resource('GPIB0::25::INSTR', write_termination='\n')
     gpib_device.write("*RST") #Resets instrument to factory default state
     gpib_device.write("*CLS") #Clears the event registers in all register groups
     print(gpib_device.query("*IDN?"))

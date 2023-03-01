@@ -1,5 +1,16 @@
 #include <ArduinoJson.h>
 
+const int pinOut = 4;
+const int pinInRise = 2;
+const int pinInFall = 3;
+
+volatile int clonedSignal = LOW;
+
+volatile bool isChargeScanActive = true;
+volatile long int count = 0, flag = 0;
+
+
+
 int number = 0;
 enum fstState {
   STOP,
@@ -17,6 +28,8 @@ static uint16_t configArray[32];  // = {895,0,0,0,0,895,0,895,0,0,0,0,0,0,0,0,0,
 static uint16_t configSetup;
 
 
+
+
 String selectedOperation;
 StaticJsonDocument<600> doc;
 DeserializationError err;
@@ -28,12 +41,22 @@ DeserializationError err;
 void setup() {
   pinMode(LED_BUILTIN, OUTPUT);
 
+  pinMode(pinInRise, INPUT);
+  pinMode(pinInFall, INPUT);
+
+  pinMode(pinOut, OUTPUT);
+
+
   // pinMode(clockPin, OUTPUT);
   // pinMode(dataPin, OUTPUT);
   Serial.begin(9600);
 }
 
 void loop() {
+
+
+
+
 
   // Check to see if anything is available in the serial receive buffer
   while (Serial.available() > 0) {
@@ -64,9 +87,8 @@ void loop() {
       //The above code is checking if the selected operation is equal to "CHARGE_SCAN_FULL_MATRIX". If it is, then it will print "Full matrix charge scan configuration" to the serial monitor. It will then set the configSetup variable to the value of the "setup" key in the JSON document. It will then print the value of configSetup to the serial monitor. It will then call the FiniteStateMachine function with the value 3.
       else if (selectedOperation.equals("CHARGE_SCAN_FULL_MATRIX")) {
 
-        Serial.println("Full matrix charge scan configuration");
         String s = doc["setup"].as<String>();
-        Serial.println(s);
+        //Serial.println(s);
 
         int value = 0;
         for (int i = 0; i < s.length(); i++)  // for every character in the string  strlen(s) returns the length of a char array
@@ -75,11 +97,83 @@ void loop() {
           if (s[i] == '1') value++;  //add 1 if needed
         }
         configSetup = value;
-        Serial.println(configSetup);
+
+
+        // prepare matrix configuration data
+        uint16_t fullMatrixConfig[32] = { configSetup, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+
+        // config the matrix enabling only the first pixel with the configuration data
+        for (int i = 0; i < 32; i++) {
+          Serial.print(fullMatrixConfig[i]);
+          Serial.print(" ");
+          // shiftOut10(dataPin, clockPin, fullMatrixConfig[i]);
+        }
+
+        // config number of injection and its amplitude
+        int numInj = doc["numInj"].as<String>().toInt();
+
+        int numStep = doc["numStep"].as<String>().toInt();
+        int Qmin = doc["Qmin"].as<String>().toInt();
+        int Qmax = doc["Qmax"].as<String>().toInt();
+
+        int deltaAmplitude = (Qmax - Qmin)/numStep;
+        int cumulatedAmplitude = Qmax;
+
+
+
+
         
+        Serial.println("");
+
+        Serial.print("FCS1-");
+        Serial.print(Qmax);
+        Serial.print("-");
+        Serial.print("PRIMA CONFIGURAZIONE MATRICE IMPOSTATA");
+        Serial.println("");
+
+        isChargeScanActive = true;
+        flag = 0;
 
 
-        FiniteStateMachine(3);
+        delay(6000); //await for instrument to trigger signal generation
+
+
+        attachInterrupt(pinInRise, riseUp, RISING);
+        attachInterrupt(pinInFall, fallDown, FALLING);
+        Serial.println("ATTACHED interrupts");
+        while (isChargeScanActive) {
+          digitalWrite(pinOut, clonedSignal);
+
+
+          if (count >= numInj) {
+            
+            count = 0;
+
+            Serial.print("UPAMP-");
+            Serial.print(flag);
+            Serial.print("-");
+            Serial.print(cumulatedAmplitude); 
+            Serial.println("");
+            cumulatedAmplitude -= deltaAmplitude;
+            flag++;
+
+          }
+
+          if(flag > numStep){
+            isChargeScanActive = false;
+
+          }
+        }
+
+        detachInterrupt(pinInRise);
+        detachInterrupt(pinInFall);
+        Serial.println("DETATCHED Interrupts");
+
+        Serial.println("EOC");
+
+
+
+        //FiniteStateMachine(3);
       } else if (selectedOperation.equals("START")) {
 
         Serial.println("LED ON");
@@ -195,4 +289,14 @@ void chargeScan() {
   }
   */
   Serial.println("Charge scan");
+}
+
+
+void riseUp() {
+  clonedSignal = HIGH;
+}
+
+void fallDown() {
+  clonedSignal = LOW;
+  count = count + 1;
 }
