@@ -87,6 +87,15 @@ void loop() {
       //The above code is checking if the selected operation is equal to "CHARGE_SCAN_FULL_MATRIX". If it is, then it will print "Full matrix charge scan configuration" to the serial monitor. It will then set the configSetup variable to the value of the "setup" key in the JSON document. It will then print the value of configSetup to the serial monitor. It will then call the FiniteStateMachine function with the value 3.
       else if (selectedOperation.equals("CHARGE_SCAN_FULL_MATRIX")) {
 
+
+        // config number of injection and its amplitude
+        int numInj = doc["numInj"].as<String>().toInt();
+
+        int numStep = doc["numStep"].as<String>().toInt();
+        int Qmin = doc["Qmin"].as<String>().toInt();
+        int Qmax = doc["Qmax"].as<String>().toInt();
+
+
         String s = doc["setup"].as<String>();
         //Serial.println(s);
 
@@ -109,20 +118,9 @@ void loop() {
           // shiftOut10(dataPin, clockPin, fullMatrixConfig[i]);
         }
 
-        // config number of injection and its amplitude
-        int numInj = doc["numInj"].as<String>().toInt();
-
-        int numStep = doc["numStep"].as<String>().toInt();
-        int Qmin = doc["Qmin"].as<String>().toInt();
-        int Qmax = doc["Qmax"].as<String>().toInt();
-
-        int deltaAmplitude = (Qmax - Qmin)/numStep;
-        int cumulatedAmplitude = Qmax;
 
 
 
-
-        
         Serial.println("");
 
         Serial.print("FCS1-");
@@ -132,36 +130,62 @@ void loop() {
         Serial.println("");
 
         isChargeScanActive = true;
-        flag = 0;
 
 
-        delay(6000); //await for instrument to trigger signal generation
+        delay(6000);  //await for instrument to trigger signal generation
 
+        int deltaAmplitude;
+        int cumulatedAmplitude;
 
         attachInterrupt(pinInRise, riseUp, RISING);
         attachInterrupt(pinInFall, fallDown, FALLING);
         Serial.println("ATTACHED interrupts");
-        while (isChargeScanActive) {
-          digitalWrite(pinOut, clonedSignal);
+        //reset
 
+        for (int i = 0; i < 32; i++) {
+          deltaAmplitude = (Qmax - Qmin) / numStep;
+          cumulatedAmplitude = Qmax;
+          flag = 0;
+          // config the matrix enabling only the first pixel with the configuration data
+          if (i != 0) {
+            fullMatrixConfig[i - 1] = 0;
 
-          if (count >= numInj) {
-            
-            count = 0;
-
-            Serial.print("UPAMP-");
-            Serial.print(flag);
-            Serial.print("-");
-            Serial.print(cumulatedAmplitude); 
+            fullMatrixConfig[i] = configSetup;
+            Serial.println("SHIFTING CONFIGURATION");
+            for (int i = 0; i < 32; i++) {
+              Serial.print(fullMatrixConfig[i]);
+              Serial.print(" ");
+              // shiftOut10(dataPin, clockPin, fullMatrixConfig[i]);
+            }
             Serial.println("");
-            cumulatedAmplitude -= deltaAmplitude;
-            flag++;
-
           }
+          isChargeScanActive = true;
 
-          if(flag > numStep){
-            isChargeScanActive = false;
+          while (isChargeScanActive) {
+            digitalWrite(pinOut, clonedSignal);
+            //reset
 
+
+            if (count >= numInj) {
+
+              count = 0;
+
+              Serial.print("DOWNAMP-");
+              Serial.print(i);  // pixel
+              Serial.print("-");
+              Serial.print(flag);  // injection
+              Serial.print("-");
+              Serial.print(cumulatedAmplitude);  // threshold
+              Serial.println("");
+              cumulatedAmplitude -= deltaAmplitude;
+              flag++;
+            }
+
+            //read
+
+            if (flag > numStep) {
+              isChargeScanActive = false;
+            }
           }
         }
 

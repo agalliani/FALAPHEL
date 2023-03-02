@@ -1,5 +1,6 @@
 from glob import glob
 import json
+from tkinter import ttk
 import serial
 import sys
 
@@ -16,9 +17,14 @@ class Singleton(type):
 
 
 class CommunicationService(metaclass=Singleton):
-
+    
     def __init__(self):
-        self.DTGService = DTGService()
+        self.DTGService = DTGService()    
+        
+        self.progressBar = ''
+        self.progressLabel = ''
+           
+        
         
         
         self.serial = serial.Serial()
@@ -79,6 +85,7 @@ class CommunicationService(metaclass=Singleton):
         return result
 
     def sendJsonData(self, data):
+
         data = json.dumps(data)
 
         if not self.serial.isOpen():
@@ -87,17 +94,34 @@ class CommunicationService(metaclass=Singleton):
         #print(data)
 
         self.serial.write(data.encode('ascii'))
+       
         try:
+            isScan = False
             while(True):
                 incoming = self.serial.readline().strip().decode("utf-8")
                 print(incoming)
+                
+                if("START" in incoming):
+                    self.progressLabel['text'] = "Connected to serial port"
+                    self.progressLabel.update()
                 if("FCS1" in incoming):
+                    self.progressLabel['text'] = "Loading..."
+                    self.progressLabel.update()
+                    isScan = True
                     initChargeAmplitude = float(incoming.split("-")[1])
                     self.DTGService.sendSettings(initChargeAmplitude)
                     self.DTGService.startSequencer()
-                if("UPAMP" in incoming):
-                    self.DTGService.setInjectionAmplitude(float(incoming.split("-")[2]))
+                if("DOWNAMP" in incoming):
+                    self.progressBar['value'] = float(incoming.split("-")[1])*100/32
+                    self.progressLabel['text'] = incoming.split("-")[1]+"/32"
+
+                    self.progressBar.update()
+                    self.progressLabel.update()
+                    self.DTGService.setInjectionAmplitude(float(incoming.split("-")[3]))
                 if(incoming == "EOC"):
+                    if isScan:
+                        self.progressBar['value'] = 100
+                        self.progressLabel['text'] = "Completed!"
                     #print("Closing serial communication")
 
                     break
@@ -172,6 +196,8 @@ class CommunicationService(metaclass=Singleton):
         print(self.customScanSettings)
 
     def sendFullScanRequest(self):
+        self.progress = 0
+        
         setup = self.mask
 
         if(self.globalMatrixConfig["leakage"] == 1):
@@ -216,3 +242,10 @@ class CommunicationService(metaclass=Singleton):
             # If x was True, set the bit indicated by the mask.
             v |= mask
         return v            # Return the result, we're done.
+
+
+    
+    def useThisProgress(self, progressBar, label):
+        self.progressBar = progressBar
+        self.progressLabel = label
+        

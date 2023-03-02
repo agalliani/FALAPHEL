@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import ttk
+from services.CommunicationService import CommunicationService
 
 from components.GlobalConfigComponent import GlobalConfigComponent
 from components.InjectionSettingsComponent import InjectionSettingsComponent
@@ -9,10 +10,23 @@ from components.SCurveComponent import SCurveComponent
 from components.ThresholdDispersionComponent import ThresholdDispersionComponent
 
 
-class MasterView:
+class Singleton(type):
+    _instances = {}
 
-    def __init__(self, root):
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super(
+                Singleton, cls).__call__(*args, **kwargs)
+        return cls._instances[cls]
+    
+class MasterView(metaclass=Singleton):
+    
+    
+        
 
+    def __init__(self, root):   
+        self.communicationService = CommunicationService()    
+        
         # main frame
         # container = ttk. LabelFrame(
         #    root, text="Container", width=200, height=100)
@@ -21,6 +35,7 @@ class MasterView:
 
         container.grid(column=0, row=0, sticky=(
             N, S, E, W), padx=5, pady=5)
+        
 
         self.build_left_section(container)
         self.build_right_section(container)
@@ -77,6 +92,18 @@ class MasterView:
             leftFrame, borderwidth=5, text="Custom Charge Scan Settings", width=200, height=100)  # custom
 
         CustomConfigComponent(customConfigFrame)
+        
+        
+        progressBar = ttk.Progressbar(
+            leftFrame, orient="horizontal", mode="determinate",length=200
+        )
+        progressBar['value'] = 0
+
+        
+        progressLabel = ttk.Label(leftFrame, text="", width=50)
+        
+        self.communicationService.useThisProgress(progressBar, progressLabel)
+
 
         #####################
         # Positioning
@@ -92,3 +119,8 @@ class MasterView:
 
         customConfigFrame.grid(column=0, row=6, columnspan=3,
                                rowspan=2, sticky=(N, S, E, W),  pady=5)
+        
+        progressBar.grid(column=0, row=8, columnspan=3,sticky=(N, S, E, W),  pady=5)
+        progressLabel.grid(column=0,row=9,sticky=(N, S, E, W), padx=(250,0))
+                
+    
